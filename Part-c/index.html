@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HSA — Student Enquiry (Live)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0d;
+      --paper: #f5f0e8;
+      --accent: #c84b2f;
+      --muted: #7a7060;
+      --border: #c8bfa8;
+      --success: #2d6a4f;
+      --error-color: #c84b2f;
+      --radius: 2px;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 2rem 2rem 0;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+    .brand { font-family: 'DM Serif Display', serif; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -0.02em; }
+    .brand em { color: var(--accent); font-style: italic; }
+    .tagline { font-size: 0.78rem; font-weight: 300; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+
+    /* WEBHOOK CONFIG BANNER */
+    .config-banner {
+      margin: 1.5rem 2rem 0;
+      padding: 0.8rem 1.2rem;
+      background: #fff8e6;
+      border: 1px solid #e6c97a;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      color: #7a5e1a;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .config-banner strong { font-weight: 600; }
+    .config-banner input {
+      flex: 1;
+      min-width: 260px;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid #e6c97a;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', monospace;
+      font-size: 0.8rem;
+      background: #fffdf5;
+      outline: none;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      max-width: 1100px;
+      margin: 2.5rem auto 4rem;
+      padding: 0 2rem;
+      width: 100%;
+    }
+
+    .left-panel {
+      padding: 3rem 3rem 3rem 0;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .left-panel h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.1; letter-spacing: -0.03em; }
+    .left-panel h1 span { display: block; color: var(--accent); font-style: italic; }
+    .left-panel p { font-size: 0.95rem; line-height: 1.75; color: var(--muted); max-width: 340px; }
+
+    .flow-indicator {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1.2rem;
+      background: rgba(13,13,13,0.04);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--accent);
+    }
+    .flow-indicator h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.3rem; }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .flow-step .dot {
+      width: 6px; height: 6px;
+      background: var(--border);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .flow-step.active .dot { background: var(--accent); }
+    .flow-step.done .dot { background: var(--success); }
+
+    .form-panel { padding: 3rem 0 3rem 3rem; }
+
+    form { display: flex; flex-direction: column; gap: 1.4rem; }
+    .field-row { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    label .req { color: var(--accent); }
+
+    input[type="text"], input[type="email"], select, textarea {
+      width: 100%; padding: 0.75rem 0.9rem;
+      background: transparent; border: 1px solid var(--border); border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--ink);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: #b0a898; }
+    input:focus, select:focus, textarea:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(13,13,13,0.06); }
+
+    .field-error input, .field-error select, .field-error textarea { border-color: var(--error-color); }
+    .error-msg { font-size: 0.72rem; color: var(--error-color); display: none; }
+    .field-error .error-msg { display: block; }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: '▾'; position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 0.8rem; }
+
+    .radio-group { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .radio-group label { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0.7rem 0.5rem; cursor: pointer; font-size: 0.78rem; letter-spacing: 0.06em; color: var(--muted); border-right: 1px solid var(--border); transition: background 0.15s, color 0.15s; text-transform: uppercase; }
+    .radio-group label:last-child { border-right: none; }
+    .radio-group input[type="radio"] { display: none; }
+    .radio-group label:has(input:checked) { background: var(--ink); color: var(--paper); }
+
+    .textarea-wrap { position: relative; }
+    textarea { resize: vertical; min-height: 100px; padding-bottom: 1.6rem; }
+    .char-counter { position: absolute; bottom: 0.5rem; right: 0.7rem; font-size: 0.68rem; color: var(--muted); pointer-events: none; }
+    .char-counter.warn { color: var(--accent); }
+
+    .submit-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      padding: 0.9rem 2rem; background: var(--ink); color: var(--paper);
+      border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s, transform 0.1s;
+    }
+    .submit-btn:hover:not(:disabled) { background: #2a2a2a; }
+    .submit-btn:active:not(:disabled) { transform: scale(0.98); }
+    .submit-btn:disabled { background: var(--border); cursor: not-allowed; }
+
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(245,240,232,0.4); border-top-color: var(--paper); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    .submit-btn.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* API STATUS TOAST */
+    .api-toast {
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      border: 1px solid;
+    }
+    .api-toast.success { background: #e8f5ee; border-color: #a7d7b8; color: var(--success); }
+    .api-toast.error { background: #fdecea; border-color: #f5b3ac; color: var(--error-color); }
+    .api-toast.show { display: flex; }
+
+    .thank-you {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; gap: 1.2rem; padding: 4rem 2rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .thank-you.show { display: flex; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    .ty-icon { width: 56px; height: 56px; border: 2px solid var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 1.6rem; }
+    .thank-you h2 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; letter-spacing: -0.02em; }
+    .thank-you p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+    .reset-btn { margin-top: 0.5rem; background: none; border: 1px solid var(--border); padding: 0.6rem 1.4rem; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 0.8rem; cursor: pointer; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; transition: border-color 0.2s, color 0.2s; }
+    .reset-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+    @media (max-width: 768px) {
+      main { grid-template-columns: 1fr; margin: 1.5rem auto 3rem; padding: 0 1.2rem; gap: 2rem; }
+      .left-panel { padding: 1.5rem 0 2rem; border-right: none; border-bottom: 1px solid var(--border); }
+      .form-panel { padding: 0; }
+      .field-row-2 { grid-template-columns: 1fr; }
+      header { padding: 1.5rem 1.2rem 0; flex-direction: column; gap: 0.3rem; }
+      .config-banner { margin: 1rem 1.2rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">H<em>S</em>A</div>
+  <div class="tagline">Higher Studies Abroad — Live Integration</div>
+</header>
+
+<!-- Webhook URL config - allows easy testing without editing source -->
+<div class="config-banner">
+  <strong>⚙ N8N Webhook URL:</strong>
+  <input type="text" id="webhookUrl" placeholder="https://your-n8n-instance.com/webhook/hsa-lead" value="" />
+  <span style="font-size:0.75rem; color:#9a7e30;">Update this to your B1 webhook URL before testing</span>
+</div>
+
+<main>
+  <div class="left-panel">
+    <div>
+      <h1>Your future <span>starts here.</span></h1>
+    </div>
+    <p>This form POSTs your data via <code style="font-size:0.85em;background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:2px;">fetch()</code> to your N8N B1 webhook in real time.</p>
+
+    <div class="flow-indicator">
+      <h3>Integration Flow</h3>
+      <div class="flow-step" id="step-form">
+        <div class="dot"></div>
+        <span>Form submitted (Part C)</span>
+      </div>
+      <div class="flow-step" id="step-fetch">
+        <div class="dot"></div>
+        <span>POST via fetch() → N8N Webhook</span>
+      </div>
+      <div class="flow-step" id="step-set">
+        <div class="dot"></div>
+        <span>Set node extracts fields</span>
+      </div>
+      <div class="flow-step" id="step-if">
+        <div class="dot"></div>
+        <span>IF: PG/PhD → Email alert</span>
+      </div>
+      <div class="flow-step" id="step-sheet">
+        <div class="dot"></div>
+        <span>Else: logged to Google Sheets</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <form id="leadForm" novalidate>
+
+      <div class="field-row-2">
+        <div class="field-row" id="wrap-name">
+          <label for="fullName">Full Name <span class="req">*</span></label>
+          <input type="text" id="fullName" name="fullName" placeholder="Jane Smith" autocomplete="name" />
+          <span class="error-msg">Please enter your full name.</span>
+        </div>
+        <div class="field-row" id="wrap-email">
+          <label for="email">Email <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com" autocomplete="email" />
+          <span class="error-msg">Enter a valid email address.</span>
+        </div>
+      </div>
+
+      <div class="field-row-2">
+        <div class="field-row" id="wrap-country">
+          <label for="country">Country <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="country" name="country">
+              <option value="">Select country…</option>
+              <option>India</option><option>United States</option><option>United Kingdom</option>
+              <option>Canada</option><option>Australia</option><option>Germany</option>
+              <option>France</option><option>Singapore</option><option>UAE</option>
+              <option>Bangladesh</option><option>Nepal</option><option>Sri Lanka</option>
+              <option>Nigeria</option><option>Kenya</option><option>Other</option>
+            </select>
+          </div>
+          <span class="error-msg">Please select your country.</span>
+        </div>
+        <div class="field-row" id="wrap-university">
+          <label for="university">Preferred University <span class="req">*</span></label>
+          <input type="text" id="university" name="university" placeholder="e.g. MIT, Oxford…" />
+          <span class="error-msg">Please enter a preferred university.</span>
+        </div>
+      </div>
+
+      <div class="field-row" id="wrap-courseLevel">
+        <label>Course Level <span class="req">*</span></label>
+        <div class="radio-group" role="group" aria-label="Course level">
+          <label><input type="radio" name="courseLevel" value="UG" /><span>Undergraduate</span></label>
+          <label><input type="radio" name="courseLevel" value="PG" /><span>Postgraduate</span></label>
+          <label><input type="radio" name="courseLevel" value="PhD" /><span>PhD</span></label>
+        </div>
+        <span class="error-msg">Please select a course level.</span>
+      </div>
+
+      <div class="field-row" id="wrap-message">
+        <label for="message">Message <span class="req">*</span></label>
+        <div class="textarea-wrap">
+          <textarea id="message" name="message" placeholder="Tell us about your academic background and goals…" maxlength="300"></textarea>
+          <span class="char-counter" id="charCounter">0 / 300</span>
+        </div>
+        <span class="error-msg">Please write a brief message (10–300 chars).</span>
+      </div>
+
+      <div class="api-toast" id="apiToast"></div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <div class="spinner"></div>
+        <span class="btn-text">Send Enquiry</span>
+      </button>
+    </form>
+
+    <div class="thank-you" id="thankYou">
+      <div class="ty-icon">✓</div>
+      <h2>Enquiry received!</h2>
+      <p>Your data was successfully POSTed to the N8N webhook.<br>An advisor will contact <strong id="tyEmail"></strong> within 24 hours.</p>
+      <button class="reset-btn" id="resetBtn">Submit another →</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  // ── CONFIG ──
+  // The webhook URL is read from the config banner input at submit time.
+  // This avoids hardcoding and makes testing easy without editing source.
+
+  const form       = document.getElementById('leadForm');
+  const submitBtn  = document.getElementById('submitBtn');
+  const thankYou   = document.getElementById('thankYou');
+  const tyEmail    = document.getElementById('tyEmail');
+  const resetBtn   = document.getElementById('resetBtn');
+  const msgArea    = document.getElementById('message');
+  const charCount  = document.getElementById('charCounter');
+  const apiToast   = document.getElementById('apiToast');
+  const webhookUrl = document.getElementById('webhookUrl');
+
+  // ── CHAR COUNTER ──
+  msgArea.addEventListener('input', () => {
+    const len = msgArea.value.length;
+    charCount.textContent = `${len} / 300`;
+    charCount.classList.toggle('warn', len >= 270);
+  });
+
+  // ── VALIDATION ──
+  function setError(wrapId, show) {
+    document.getElementById(wrapId)?.classList.toggle('field-error', show);
+  }
+
+  function validateEmail(val) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+  }
+
+  function validateForm() {
+    let valid = true;
+    const checks = [
+      { id: 'fullName',    wrap: 'wrap-name',        ok: v => v.trim().length >= 2 },
+      { id: 'email',       wrap: 'wrap-email',       ok: v => validateEmail(v) },
+      { id: 'country',     wrap: 'wrap-country',     ok: v => v !== '' },
+      { id: 'university',  wrap: 'wrap-university',  ok: v => v.trim().length >= 2 },
+      { id: 'message',     wrap: 'wrap-message',     ok: v => v.trim().length >= 10 && v.trim().length <= 300 },
+    ];
+
+    for (const { id, wrap, ok } of checks) {
+      const val = document.getElementById(id).value;
+      const isOk = ok(val);
+      setError(wrap, !isOk);
+      if (!isOk) valid = false;
+    }
+
+    const level = document.querySelector('input[name="courseLevel"]:checked');
+    setError('wrap-courseLevel', !level);
+    if (!level) valid = false;
+
+    return valid;
+  }
+
+  // Live clear errors
+  ['fullName', 'email', 'country', 'university', 'message'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      document.getElementById('wrap-' + id)?.classList.remove('field-error');
+    });
+  });
+  document.querySelectorAll('input[name="courseLevel"]').forEach(r =>
+    r.addEventListener('change', () => setError('wrap-courseLevel', false))
+  );
+
+  // ── FLOW INDICATOR ──
+  function setFlowStep(step) {
+    ['step-form','step-fetch','step-set','step-if','step-sheet'].forEach(id => {
+      document.getElementById(id)?.classList.remove('active', 'done');
+    });
+    const steps = ['step-form','step-fetch','step-set','step-if','step-sheet'];
+    const idx = steps.indexOf(step);
+    steps.slice(0, idx).forEach(id => document.getElementById(id)?.classList.add('done'));
+    if (step) document.getElementById(step)?.classList.add('active');
+  }
+
+  // ── TOAST ──
+  function showToast(type, msg) {
+    apiToast.className = `api-toast show ${type}`;
+    apiToast.textContent = msg;
+  }
+  function hideToast() { apiToast.className = 'api-toast'; }
+
+  // ── SUBMIT ──
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideToast();
+
+    if (!validateForm()) return;
+
+    const url = webhookUrl.value.trim();
+    if (!url) {
+      showToast('error', '⚠ Please enter your N8N webhook URL in the banner above.');
+      return;
+    }
+
+    const payload = {
+      fullName:    document.getElementById('fullName').value.trim(),
+      email:       document.getElementById('email').value.trim(),
+      country:     document.getElementById('country').value,
+      courseLevel: document.querySelector('input[name="courseLevel"]:checked').value,
+      university:  document.getElementById('university').value.trim(),
+      message:     msgArea.value.trim(),
+      submittedAt: new Date().toISOString(),
+    };
+
+    console.log('Submitting payload to N8N:', JSON.stringify(payload, null, 2));
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    submitBtn.querySelector('.btn-text').textContent = 'Sending…';
+    setFlowStep('step-form');
+
+    try {
+      setFlowStep('step-fetch');
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      setFlowStep('step-set');
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Webhook responded with ${response.status}: ${text}`);
+      }
+
+      const data = await response.json().catch(() => ({}));
+      console.log('N8N webhook response:', data);
+
+      // Animate flow for demo
+      await delay(400);
+      setFlowStep('step-if');
+      await delay(500);
+      setFlowStep(payload.courseLevel === 'UG' ? 'step-sheet' : 'step-if');
+
+      // Show success
+      submitBtn.classList.remove('loading');
+      form.style.display = 'none';
+      tyEmail.textContent = payload.email;
+      thankYou.classList.add('show');
+
+    } catch (err) {
+      console.error('Fetch error:', err);
+      showToast('error', `❌ Submission failed: ${err.message}`);
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      submitBtn.querySelector('.btn-text').textContent = 'Retry';
+      setFlowStep(null);
+    }
+  });
+
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // ── RESET ──
+  resetBtn.addEventListener('click', () => {
+    form.reset();
+    charCount.textContent = '0 / 300';
+    hideToast();
+    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+    ['step-form','step-fetch','step-set','step-if','step-sheet'].forEach(id =>
+      document.getElementById(id)?.classList.remove('active', 'done')
+    );
+    thankYou.classList.remove('show');
+    form.style.display = 'flex';
+    submitBtn.querySelector('.btn-text').textContent = 'Send Enquiry';
+  });
+</script>
+</body>
+</html>

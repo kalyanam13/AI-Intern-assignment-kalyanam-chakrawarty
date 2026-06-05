@@ -1,0 +1,184 @@
+{
+  "name": "B1 Lead Notification Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "student-lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "39913939-1b7b-490a-b870-6f294c746152",
+      "name": "Webhook",
+      "webhookId": "181d4e5d-1426-4f16-8cf8-495797ebdd03"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c82eaf05-f278-483d-99d3-92a06a3fa9e4",
+              "name": "Name",
+              "value": "={{ $json.body.fullName }}",
+              "type": "string"
+            },
+            {
+              "id": "9b9a1d8c-e7f4-40ca-8f81-0aaf3ef7ee6a",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "1d7643da-ff12-4093-afb9-a044f06bc7db",
+              "name": "courseLevel",
+              "value": "={{ $json.body.courseLevel }}",
+              "type": "string"
+            },
+            {
+              "id": "506f49cd-c026-4d4b-8953-d98133eb3e68",
+              "name": "country",
+              "value": "={{ $json.body.country }}",
+              "type": "string"
+            },
+            {
+              "id": "b649189a-eee2-49a2-bba3-5c14d686c1f5",
+              "name": "university",
+              "value": "={{ $json.body.university }}",
+              "type": "string"
+            },
+            {
+              "id": "6bd241a5-4599-4e2c-8ffc-de3c0df2d1fb",
+              "name": "message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "96b16b94-880f-4bb8-aa60-e3b2b105a08f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c954634a-b1aa-4597-bbc0-0edf774618d9",
+              "leftValue": "={{ $json.courseLevel }}",
+              "rightValue": "=^(PG|PhD)$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        -32
+      ],
+      "id": "905d89a0-a466-4af0-80d5-fc7f15339245",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -128
+      ],
+      "id": "da70db40-a816-4abd-86c0-73531438f5e9",
+      "name": "Email Alert - Mock"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        400,
+        64
+      ],
+      "id": "d73e4d06-1ab7-4833-99d2-53097ec73c5f",
+      "name": "Log to Sheets - Mock"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Email Alert - Mock",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to Sheets - Mock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "06e22255-8f2d-4ad5-a40e-9ec6af3a04f3",
+  "meta": {
+    "instanceId": "453a9a74a77a3ba81508094e39ae3c010132d63a07913da9b34c4f0d8ca4b1ee"
+  },
+  "id": "YCG6HCP3C3jLsPiH",
+  "tags": []
+}
+

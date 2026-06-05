@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HSA — Student Enquiry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0d;
+      --paper: #f5f0e8;
+      --cream: #ede7d9;
+      --accent: #c84b2f;
+      --accent-dark: #9e3820;
+      --muted: #7a7060;
+      --border: #c8bfa8;
+      --success: #2d6a4f;
+      --error: #c84b2f;
+      --radius: 2px;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 2rem 0;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+    .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .brand em { color: var(--accent); font-style: italic; }
+    .tagline {
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── LAYOUT ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      max-width: 1100px;
+      margin: 2.5rem auto 4rem;
+      padding: 0 2rem;
+      width: 100%;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      padding: 3rem 3rem 3rem 0;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .left-panel h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .left-panel h1 span {
+      display: block;
+      color: var(--accent);
+      font-style: italic;
+    }
+    .left-panel p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 340px;
+    }
+    .stats {
+      display: flex;
+      gap: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .stat-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.9rem;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* ── FORM PANEL ── */
+    .form-panel {
+      padding: 3rem 0 3rem 3rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .field-row { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    label .req { color: var(--accent); }
+
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: #b0a898; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 3px rgba(13,13,13,0.06);
+    }
+    .field-error input,
+    .field-error select,
+    .field-error textarea {
+      border-color: var(--error);
+    }
+    .error-msg {
+      font-size: 0.72rem;
+      color: var(--error);
+      display: none;
+    }
+    .field-error .error-msg { display: block; }
+
+    /* Select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-size: 0.8rem;
+    }
+
+    /* Radio group */
+    .radio-group {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .radio-group label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 0.5rem;
+      cursor: pointer;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      border-right: 1px solid var(--border);
+      transition: background 0.15s, color 0.15s;
+      text-transform: uppercase;
+    }
+    .radio-group label:last-child { border-right: none; }
+    .radio-group input[type="radio"] { display: none; }
+    .radio-group input[type="radio"]:checked + span {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .radio-group label:has(input:checked) {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    /* Textarea + counter */
+    .textarea-wrap { position: relative; }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      padding-bottom: 1.6rem;
+    }
+    .char-counter {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.7rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .char-counter.warn { color: var(--accent); }
+
+    /* Submit button */
+    .submit-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.9rem 2rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .submit-btn:hover { background: #2a2a2a; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+    /* Loading spinner */
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(245,240,232,0.4);
+      border-top-color: var(--paper);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .submit-btn.loading .spinner { display: block; }
+    .submit-btn.loading .btn-text { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── THANK YOU ── */
+    .thank-you {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 1.2rem;
+      padding: 4rem 2rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .thank-you.show { display: flex; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .ty-icon {
+      width: 56px; height: 56px;
+      border: 2px solid var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--success);
+      font-size: 1.6rem;
+    }
+    .thank-you h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      letter-spacing: -0.02em;
+    }
+    .thank-you p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+    .reset-btn {
+      margin-top: 0.5rem;
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.6rem 1.4rem;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .reset-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+        margin: 1.5rem auto 3rem;
+        padding: 0 1.2rem;
+        gap: 2rem;
+      }
+      .left-panel {
+        padding: 1.5rem 0 2rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .form-panel { padding: 0; }
+      .field-row-2 { grid-template-columns: 1fr; }
+      header { padding: 1.5rem 1.2rem 0; flex-direction: column; gap: 0.3rem; }
+    }
+
+    @media (max-width: 400px) {
+      .stats { flex-wrap: wrap; gap: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">H<em>S</em>A</div>
+  <div class="tagline">Higher Studies Abroad</div>
+</header>
+
+<main>
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div>
+      <h1>Your future <span>starts here.</span></h1>
+    </div>
+    <p>Connect with top universities worldwide. Share your academic goals and our advisors will reach out within 24 hours with tailored guidance.</p>
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-num">200+</span>
+        <span class="stat-label">Universities</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">45+</span>
+        <span class="stat-label">Countries</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">12K+</span>
+        <span class="stat-label">Students Placed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM PANEL -->
+  <div class="form-panel">
+    <form id="leadForm" novalidate>
+
+      <div class="field-row-2">
+        <!-- Full Name -->
+        <div class="field-row" id="wrap-name">
+          <label for="fullName">Full Name <span class="req">*</span></label>
+          <input type="text" id="fullName" name="fullName" placeholder="Jane Smith" autocomplete="name" />
+          <span class="error-msg" id="err-name">Please enter your full name.</span>
+        </div>
+
+        <!-- Email -->
+        <div class="field-row" id="wrap-email">
+          <label for="email">Email <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com" autocomplete="email" />
+          <span class="error-msg" id="err-email">Enter a valid email address.</span>
+        </div>
+      </div>
+
+      <div class="field-row-2">
+        <!-- Country -->
+        <div class="field-row" id="wrap-country">
+          <label for="country">Country <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="country" name="country">
+              <option value="">Select country…</option>
+              <option>India</option><option>United States</option><option>United Kingdom</option>
+              <option>Canada</option><option>Australia</option><option>Germany</option>
+              <option>France</option><option>Singapore</option><option>UAE</option>
+              <option>Bangladesh</option><option>Nepal</option><option>Sri Lanka</option>
+              <option>Nigeria</option><option>Kenya</option><option>Other</option>
+            </select>
+          </div>
+          <span class="error-msg" id="err-country">Please select your country.</span>
+        </div>
+
+        <!-- Preferred University -->
+        <div class="field-row" id="wrap-university">
+          <label for="university">Preferred University <span class="req">*</span></label>
+          <input type="text" id="university" name="university" placeholder="e.g. MIT, Oxford…" />
+          <span class="error-msg" id="err-university">Please enter a preferred university.</span>
+        </div>
+      </div>
+
+      <!-- Course Level -->
+      <div class="field-row" id="wrap-courseLevel">
+        <label>Course Level <span class="req">*</span></label>
+        <div class="radio-group" role="group" aria-label="Course level">
+          <label>
+            <input type="radio" name="courseLevel" value="UG" />
+            <span>Undergraduate</span>
+          </label>
+          <label>
+            <input type="radio" name="courseLevel" value="PG" />
+            <span>Postgraduate</span>
+          </label>
+          <label>
+            <input type="radio" name="courseLevel" value="PhD" />
+            <span>PhD</span>
+          </label>
+        </div>
+        <span class="error-msg" id="err-courseLevel">Please select a course level.</span>
+      </div>
+
+      <!-- Message -->
+      <div class="field-row" id="wrap-message">
+        <label for="message">Message <span class="req">*</span></label>
+        <div class="textarea-wrap">
+          <textarea id="message" name="message" placeholder="Tell us about your academic background and goals…" maxlength="300"></textarea>
+          <span class="char-counter" id="charCounter">0 / 300</span>
+        </div>
+        <span class="error-msg" id="err-message">Please write a brief message (10–300 chars).</span>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <div class="spinner"></div>
+        <span class="btn-text">Send Enquiry</span>
+      </button>
+
+    </form>
+
+    <!-- Thank you state -->
+    <div class="thank-you" id="thankYou">
+      <div class="ty-icon">✓</div>
+      <h2>Enquiry received!</h2>
+      <p>Thank you for reaching out. An HSA advisor will contact you at <strong id="tyEmail"></strong> within 24 hours.</p>
+      <button class="reset-btn" id="resetBtn">Submit another →</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  // ── ELEMENTS ──
+  const form       = document.getElementById('leadForm');
+  const submitBtn  = document.getElementById('submitBtn');
+  const thankYou   = document.getElementById('thankYou');
+  const tyEmail    = document.getElementById('tyEmail');
+  const resetBtn   = document.getElementById('resetBtn');
+  const msgArea    = document.getElementById('message');
+  const charCount  = document.getElementById('charCounter');
+
+  // ── CHAR COUNTER ──
+  msgArea.addEventListener('input', () => {
+    const len = msgArea.value.length;
+    charCount.textContent = `${len} / 300`;
+    charCount.classList.toggle('warn', len >= 270);
+  });
+
+  // ── VALIDATION HELPERS ──
+  function setError(wrapId, show) {
+    const el = document.getElementById(wrapId);
+    el.classList.toggle('field-error', show);
+  }
+
+  function validateEmail(val) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+  }
+
+  function validateForm() {
+    let valid = true;
+
+    // Full name
+    const name = document.getElementById('fullName').value.trim();
+    const nameOk = name.length >= 2;
+    setError('wrap-name', !nameOk);
+    if (!nameOk) valid = false;
+
+    // Email
+    const email = document.getElementById('email').value.trim();
+    const emailOk = validateEmail(email);
+    setError('wrap-email', !emailOk);
+    if (!emailOk) valid = false;
+
+    // Country
+    const country = document.getElementById('country').value;
+    const countryOk = country !== '';
+    setError('wrap-country', !countryOk);
+    if (!countryOk) valid = false;
+
+    // University
+    const uni = document.getElementById('university').value.trim();
+    const uniOk = uni.length >= 2;
+    setError('wrap-university', !uniOk);
+    if (!uniOk) valid = false;
+
+    // Course level
+    const level = document.querySelector('input[name="courseLevel"]:checked');
+    const levelOk = level !== null;
+    setError('wrap-courseLevel', !levelOk);
+    if (!levelOk) valid = false;
+
+    // Message
+    const msg = msgArea.value.trim();
+    const msgOk = msg.length >= 10 && msg.length <= 300;
+    setError('wrap-message', !msgOk);
+    if (!msgOk) valid = false;
+
+    return valid;
+  }
+
+  // ── LIVE CLEAR ERRORS ──
+  ['fullName', 'email', 'country', 'university', 'message'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const wrap = document.getElementById('wrap-' + id);
+      if (wrap) wrap.classList.remove('field-error');
+    });
+  });
+  document.querySelectorAll('input[name="courseLevel"]').forEach(r => {
+    r.addEventListener('change', () => setError('wrap-courseLevel', false));
+  });
+
+  // ── SUBMIT ──
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    // Build payload
+    const payload = {
+      fullName:    document.getElementById('fullName').value.trim(),
+      email:       document.getElementById('email').value.trim(),
+      country:     document.getElementById('country').value,
+      courseLevel: document.querySelector('input[name="courseLevel"]:checked').value,
+      university:  document.getElementById('university').value.trim(),
+      message:     msgArea.value.trim(),
+      submittedAt: new Date().toISOString(),
+    };
+
+    console.log('Lead captured:', JSON.stringify(payload, null, 2));
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+
+    try {
+      const response = await fetch('http://localhost:5678/webhook-test/student-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      // N8N test webhook returns 200 even without a Respond node
+      if (!response.ok) throw new Error(`Status ${response.status}`);
+
+      console.log('N8N webhook response received!');
+    } catch (err) {
+      // Still show thank-you for testing — log the error
+      console.warn('Webhook note:', err.message);
+    }
+
+    // Show thank-you
+    submitBtn.classList.remove('loading');
+    form.style.display = 'none';
+    tyEmail.textContent = payload.email;
+    thankYou.classList.add('show');
+  });
+
+  // ── RESET ──
+  resetBtn.addEventListener('click', () => {
+    form.reset();
+    charCount.textContent = '0 / 300';
+    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+    thankYou.classList.remove('show');
+    form.style.display = 'flex';
+  });
+</script>
+</body>
+</html>
+
+
