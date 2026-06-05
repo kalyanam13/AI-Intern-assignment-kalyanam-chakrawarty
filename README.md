@@ -1,5 +1,5 @@
 # AI Intern Assignment — HSA Team
-**Kalyanam · kalyanamchakrawarty66@email.com · June 2026**
+**Kalyanam · kalyanamchakrawarty66@email.com · 05 June 2026**
 
 ---
 
@@ -29,7 +29,7 @@ ai-intern-assignment-kalyanam/
 A fully self-contained student lead capture form built with pure HTML, CSS, and vanilla JavaScript (no frameworks).
 
 **Features:**
-- Fields: Full name, Email, Country (dropdown), Course Level (radio: UG/PG/PhD), Preferred University, Message (with live 600-char counter)
+- Fields: Full name, Email, Country (dropdown), Course Level (radio: UG/PG/PhD), Preferred University, Message (with live 300-char counter)
 - Client-side validation with inline error messages on each field
 - Thank-you state shown without page reload on successful submit
 - Form data logged as JSON to the browser console on submission
